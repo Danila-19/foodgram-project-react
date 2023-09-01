@@ -184,8 +184,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_cart = Recipe.objects.filter(cart__user=user)
         ingredients = shopping_cart.values(
             recipe_name=F('ingredients__name'),
-            measurement_unit=F('ingredients__measurement_unit')
-                                          ).annotate(
+            measurement_unit=F('ingredients__measurement_unit')).annotate(
             amount=Sum('recipe_ingredients__amount'))
         file_name = 'shopping_cart.txt'
         response = HttpResponse(content_type='text/plain')
