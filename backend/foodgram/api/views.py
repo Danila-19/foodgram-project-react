@@ -185,9 +185,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = shopping_cart.values(
             recipe_name=F('ingredients__name'),
             measurement_unit=F('ingredients__measurement_unit')
-                            ).annotate(
-            amount=Sum('recipe_ingredients__amount')
-                            )
+                                          ).annotate(
+            amount=Sum('recipe_ingredients__amount'))
         file_name = 'shopping_cart.txt'
         response = HttpResponse(content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename="{file_name}"'
