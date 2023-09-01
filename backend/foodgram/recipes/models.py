@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
 
 
@@ -64,4 +63,8 @@ class Favorite(models.Model):
         User,
         related_name='favourite',
         on_delete=models.CASCADE
+    )
+    pub_date = models.DateTimeField(
+        verbose_name='Дата добавления',
+        auto_now_add=True,
     )

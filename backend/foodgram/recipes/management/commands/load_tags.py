@@ -6,11 +6,10 @@ from recipes.models import Tag
 
 
 class Command(BaseCommand):
-    help = 'Загрузка тегов'
 
     def handle(self, *args, **options):
 
-        with open('tags.csv', newline='') as csvfile:
+        with open('tags.csv', newline='', encoding="utf-8") as csvfile:
             reader = csv.reader(csvfile, delimiter=',', quotechar='"')
             for row in reader:
                 name = row[0]
@@ -21,4 +20,4 @@ class Command(BaseCommand):
                           slug=slug)
                 tag.save()
 
-        print('Успешная загрузка')
+        print('Загрузил!')
