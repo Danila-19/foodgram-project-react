@@ -172,9 +172,18 @@ class RecipePostSerializer(ShowingRecipeSerializer):
         author = self.context.get('request').user
         ingredients = validated_data.pop('recipe_ingredients')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(author=author, **validated_data)
-        recipe.tags.set(tags)
-        ingredients_list = self.process_ingredients(recipe, ingredients)
+        recipe = Recipe.objects.create(**validated_data, author=author)
+        recipe.tags.add(*tags)
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient['ingredient']['id']
+            current_amount = ingredient.get('amount')
+            ingredients_list.append(
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient_id,
+                    amount=current_amount
+                ))
         RecipeIngredient.objects.bulk_create(ingredients_list)
         return recipe
 
@@ -184,9 +193,19 @@ class RecipePostSerializer(ShowingRecipeSerializer):
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredients')
         tags = validated_data.pop('tags')
-        instance.tags.set(tags)
+        instance.tags.clear()
+        instance.tags.add(*tags)
         RecipeIngredient.objects.filter(recipe=instance).delete()
-        ingredients_list = self.process_ingredients(instance, ingredients)
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient['ingredient']['id']
+            current_amount = ingredient.get('amount')
+            ingredients_list.append(
+                RecipeIngredient(
+                    recipe=instance,
+                    ingredient=ingredient_id,
+                    amount=current_amount
+                ))
         RecipeIngredient.objects.bulk_create(ingredients_list)
         for field, value in validated_data.items():
             setattr(instance, field, value)

@@ -2,10 +2,9 @@ version: '3.3'
 volumes:
   pg_data:
   static:
+  media_volume:
 
 services:
-
-
   # Имя и описание первого контейнера; имя выбирает разработчик. 
   # Это контейнер БД
   db:
@@ -19,22 +18,28 @@ services:
   
   backend:
     build: ./backend/
-    env_file: .env
     volumes:
-      - static:/app/static/
+        - static:/app/static/
+        - media_volume:/app/media/
+    depends_on:
+        - db
+    env_file:
+        - .env
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    env_file: .env
+    build: ./frontend/
     volumes:
-      - ../frontend/:/app/result_build/
+      - ./frontend/:/app/result_build/
+    depends_on:
+      - backend
   nginx:
     image: nginx:1.19.3
     ports:
-      - "80:8000"
+      - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - static:/var/html/static/
+      - media_volume:/media
