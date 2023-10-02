@@ -37,6 +37,9 @@ class Tag(models.Model):
     color = models.CharField(max_length=7, verbose_name='Цвет')
     slug = models.SlugField(max_length=200, unique=True, verbose_name='Slug')
 
+    class Meta:
+        verbose_name = 'Тэги'
+
     def __str__(self):
         return self.name
 
@@ -45,6 +48,9 @@ class Ingredient(models.Model):
     name = models.CharField(max_length=200, verbose_name='Наименование')
     measurement_unit = models.CharField(max_length=200,
                                         verbose_name='Единица измерения')
+
+    class Meta:
+        verbose_name = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -70,6 +76,9 @@ class Recipe(models.Model):
         validators=[validate_cooking_time])
     pub_date = models.DateTimeField(auto_now=True,
                                     verbose_name='Дата публикации')
+
+    class Meta:
+        verbose_name = 'Рецепты'
 
     def __str__(self):
         return self.name
@@ -102,6 +111,9 @@ class ShoppingCart(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name='Пользователь')
 
+    class Meta:
+        verbose_name = 'Список покупок'
+
     def __str__(self):
         return f'{self.user.username} - {self.recipe.name}'
 
@@ -117,6 +129,9 @@ class Favorite(models.Model):
                              verbose_name='Пользователь')
     pub_date = models.DateTimeField(verbose_name='Дата добавления',
                                     auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Избранное'
 
     def __str__(self):
         return f'{self.user.username} - {self.recipe.name}'
