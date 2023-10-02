@@ -60,12 +60,10 @@ class ShowUserSerializer(UserSerializer):
                   'last_name', 'is_subscribed',)
 
     def get_is_subscribed(self, obj):
-        if (
-            self.context.get('request')
-            and not self.context['request'].user.is_anonymous
-        ):
-            return obj.following.filter(
-                user=self.context['request'].user).exists()
+        if (self.context.get('request')
+           and not self.context['request'].user.is_anonymous):
+            return Follow.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
         return False
 
 
@@ -219,7 +217,7 @@ class RecipePostSerializer(ShowingRecipeSerializer):
 
 
 class FavouriteSerializer(serializers.ModelSerializer):
-
+    image = Base64ImageField(read_only=True)
     name = serializers.ReadOnlyField()
     cooking_time = serializers.ReadOnlyField()
 
@@ -254,6 +252,17 @@ class FavoriteShopingCartSubsrRecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
         fields = ['id', 'name', 'image', 'cooking_time']
+
+    def get_is_favorited(self, obj):
+        user = self.context.get('request').user
+        return (not user.is_anonymous
+                and Favorite.objects.filter(recipe=obj, user=user).exists())
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context.get('request').user
+        return (not user.is_anonymous
+                and ShoppingCart.objects.filter(recipe=obj,
+                                                user=user).exists())
 
 
 class UserSubscribeSerializer(ShowUserSerializer):

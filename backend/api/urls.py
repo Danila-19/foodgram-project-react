@@ -14,7 +14,4 @@ router.register('recipes', RecipeViewSet)
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     path('', include(router.urls)),
-    path('recipes/<int:pk>/favorite/', RecipeViewSet.as_view(
-        {'post': 'favorite_recipe', 'delete': 'favorite_recipe'}),
-        name='recipe-favorite'),
 ]
