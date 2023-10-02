@@ -38,7 +38,8 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=200, unique=True, verbose_name='Slug')
 
     class Meta:
-        verbose_name = 'Тэги'
+        verbose_name = 'Тэг'
+        verbose_name_plural = 'Тэги'
 
     def __str__(self):
         return self.name
@@ -50,7 +51,8 @@ class Ingredient(models.Model):
                                         verbose_name='Единица измерения')
 
     class Meta:
-        verbose_name = 'Ингредиенты'
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return self.name
@@ -78,7 +80,8 @@ class Recipe(models.Model):
                                     verbose_name='Дата публикации')
 
     class Meta:
-        verbose_name = 'Рецепты'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def __str__(self):
         return self.name
@@ -113,6 +116,7 @@ class ShoppingCart(models.Model):
 
     class Meta:
         verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
 
     def __str__(self):
         return f'{self.user.username} - {self.recipe.name}'
@@ -132,6 +136,7 @@ class Favorite(models.Model):
 
     class Meta:
         verbose_name = 'Избранное'
+        verbose_name_plural = 'Избранное'
 
     def __str__(self):
         return f'{self.user.username} - {self.recipe.name}'
