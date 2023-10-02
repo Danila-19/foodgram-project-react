@@ -1,30 +1,27 @@
 from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.http import HttpResponse
-from djoser.views import UserViewSet
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status, viewsets, filters, status, viewsets
+from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
+from rest_framework import filters, status, viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-from recipes.models import Ingredient, Recipe, Tag
 from api.filters import RecipeFilter
 from api.pagination import CustomPaginator
-from api.serializers import (
-    CreateUserSerializer,
-    FavoriteShopingCartSubsrRecipeSerializer,
-    IngredientSerializer,
-    RecipePostSerializer,
-    ShowingRecipeSerializer,
-    ShowUserSerializer,
-    TagSerializer,
-    UserPasswordResetSerializer,
-    UserSubscribeSerializer,
-    FavouriteSerializer,
-)
-from recipes.models import Favorite, RecipeIngredient, ShoppingCart
+from api.serializers import (CreateUserSerializer,
+                             FavoriteShopingCartSubsrRecipeSerializer,
+                             FavouriteSerializer, IngredientSerializer,
+                             RecipePostSerializer, ShowingRecipeSerializer,
+                             ShowUserSerializer, TagSerializer,
+                             UserPasswordResetSerializer,
+                             UserSubscribeSerializer)
+from recipes.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                            ShoppingCart, Tag)
 from users.models import Follow
 
 
