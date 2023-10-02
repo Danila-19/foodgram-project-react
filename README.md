@@ -2,3 +2,4 @@
 superuser
 login = admin
 password = 021979Man
+https://foodgram-mandreykin.ddns.net
