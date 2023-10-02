@@ -14,7 +14,7 @@ class RecipeFilter(FilterSet):
     author = filters.ModelChoiceFilter(
         queryset=User.objects.all(),
     )
-    is_favorited = filters.NumberFilter(
+    is_favorited = filters.BooleanFilter(
         method='is_favorited_method')
     is_in_shopping_cart = filters.BooleanFilter(
         method='is_in_shopping_cart_method')
@@ -28,7 +28,7 @@ class RecipeFilter(FilterSet):
         if user.is_anonymous:
             return Recipe.objects.none()
         if value:
-            return queryset.filter(favorite_recipe__user=user)
+            return queryset.filter(favored_by__user=user)
         return queryset
 
     def is_in_shopping_cart_method(self, queryset, name, value):

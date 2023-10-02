@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import F, Sum
 from django.http import HttpResponse
 from djoser.views import UserViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets, filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -127,6 +128,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     pagination_class = CustomPaginator
     filterset_class = RecipeFilter
+    filter_backends = (DjangoFilterBackend, )
 
     def get_serializer_class(self):
         if self.request.method == 'GET':

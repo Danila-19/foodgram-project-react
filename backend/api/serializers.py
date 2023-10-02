@@ -118,7 +118,7 @@ class ShowingRecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         user = self.context.get('request').user
         return (not user.is_anonymous
-                and Favorite.objects.filter(user=user, recipe=obj).exists())
+                and Favorite.objects.filter(recipe=obj, user=user).exists())
 
     def get_is_in_shopping_cart(self, obj):
         user = self.context.get('request').user
@@ -271,21 +271,15 @@ class UserSubscribeSerializer(ShowUserSerializer):
     email = serializers.ReadOnlyField()
     username = serializers.ReadOnlyField()
     is_subscribed = serializers.SerializerMethodField()
-    recipes = FavoriteShopingCartSubsrRecipeSerializer(
-        source='favorites',
-        many=True, read_only=True
-    )
+    recipes = FavouriteSerializer(many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
-    followers_count = serializers.SerializerMethodField()
-    following_count = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = ('email', 'id',
                   'username', 'first_name',
                   'last_name', 'is_subscribed',
-                  'recipes', 'recipes_count', 'followers_count',
-                  'following_count')
+                  'recipes', 'recipes_count',)
 
     def validate(self, data):
         data = super().validate(data)
@@ -313,12 +307,6 @@ class UserSubscribeSerializer(ShowUserSerializer):
     def get_recipes_count(self, obj: User) -> int:
 
         return obj.recipes.count()
-
-    def get_followers_count(self, obj):
-        return obj.follower.count()
-
-    def get_following_count(self, obj):
-        return obj.following.count()
 
 
 class UserPasswordResetSerializer(serializers.Serializer):
