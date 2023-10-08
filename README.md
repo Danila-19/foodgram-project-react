@@ -102,7 +102,7 @@ http://127.0.0.1/api/docs/
 
 Данила Мандрейкин
 
-# praktikum_new_diplom
+
 superuser
 login = admin
 password = 021979Man
