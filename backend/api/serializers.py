@@ -163,6 +163,7 @@ class RecipePostSerializer(ShowingRecipeSerializer):
         ingredients = validated_data.pop('recipe_recipe_ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(author=author, **validated_data)
+        recipe.save()
         recipe.tags.set(tags)
         ingredients_list = self.process_ingredients(recipe, ingredients)
         RecipeIngredient.objects.bulk_create(ingredients_list)
