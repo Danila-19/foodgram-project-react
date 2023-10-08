@@ -176,7 +176,7 @@ class RecipePostSerializer(ShowingRecipeSerializer):
         ingredients = validated_data.pop('recipe_recipe_ingredients')
         tags = validated_data.pop('tags')
         instance.tags.set(tags)
-        instance.ingredient_recipe_ingredients.all().delete()
+        instance.recipe_recipe_ingredients.all().delete()
         ingredients_list = self.process_ingredients(instance, ingredients)
         RecipeIngredient.objects.bulk_create(ingredients_list)
         for field, value in validated_data.items():
