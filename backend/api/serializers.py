@@ -94,7 +94,7 @@ class ShowingRecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
-        source='recipe_ingredients')
+        source='recipe_recipe_ingredients')
     image = Base64ImageField(required=False, allow_null=True)
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
@@ -137,7 +137,7 @@ def process_ingredients(self, recipe, ingredients):
 class RecipePostSerializer(ShowingRecipeSerializer):
 
     ingredients = RecipeIngredientSerializer(
-        source='recipe_ingredients',
+        source='recipe_recipe_ingredients',
         many=True,)
     image = Base64ImageField(required=False, allow_null=True)
     author = ShowUserSerializer(read_only=True, required=False)
