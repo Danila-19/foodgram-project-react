@@ -133,17 +133,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
     def favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         serializer = FavouriteSerializer(recipe, context={"request": request})
-
         if request.method == 'POST':
-            if Favorite.objects.filter(user=request.user,
-                                       recipe=recipe).exists():
+            if request.user.favorite_recipes.filter(recipe=recipe).exists():
                 return Response({'errors': 'Рецепт уже добавлен в избранное'},
                                 status=status.HTTP_400_BAD_REQUEST)
             Favorite.objects.create(user=request.user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if not Favorite.objects.filter(user=request.user,
-                                       recipe=recipe).exists():
+        if not request.user.favorite_recipes.filter(recipe=recipe).exists():
             return Response({'errors': 'Рецепта нет в избранном'},
                             status=status.HTTP_400_BAD_REQUEST)
         favorite = get_object_or_404(Favorite, user=request.user,

@@ -10,7 +10,6 @@ from recipes.models import (
     RecipeIngredient,
     ShoppingCart,
     Tag,
-    Favorite
 )
 from users.models import Follow
 
@@ -51,7 +50,6 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class ShowUserSerializer(UserSerializer):
-
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -60,17 +58,11 @@ class ShowUserSerializer(UserSerializer):
                   'last_name', 'is_subscribed',)
 
     def get_is_subscribed(self, obj):
-        if (self.context.get('request')
-           and not self.context['request'].user.is_anonymous):
-            return Follow.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
-        return False
+        return obj.follower.filter(user=self.context['request'].user).exists()
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
 
-    MIN_AMOUNT_OR_COOKING_TIME = 1
-    MAX_AMOUNT_OR_COOKING_TIME = 32000
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),
                                             source='ingredient.id')
     name = serializers.CharField(
@@ -88,7 +80,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             'min_value': f'Количество должно быть не менее '
             f'{MIN_AMOUNT_OR_COOKING_TIME}',
             'max_value': f'Количество не должно превышать '
-            f'{MIN_AMOUNT_OR_COOKING_TIME}',
+            f'{MAX_AMOUNT_OR_COOKING_TIME}',
         }
     )
 
@@ -116,12 +108,12 @@ class ShowingRecipeSerializer(serializers.ModelSerializer):
             'is_in_shopping_cart',)
 
     def get_is_favorited(self, obj):
-        user = self.context.get('request').user
+        user = self.context['request'].user
         return (not user.is_anonymous
-                and Favorite.objects.filter(recipe=obj, user=user).exists())
+                and obj.favored_by.filter(user=user).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
+        user = self.context['request'].user
         return (not user.is_anonymous
                 and obj.carts.filter(user=user).exists())
 
@@ -170,18 +162,9 @@ class RecipePostSerializer(ShowingRecipeSerializer):
         author = self.context.get('request').user
         ingredients = validated_data.pop('recipe_ingredients')
         tags = validated_data.pop('tags')
-        recipe = Recipe.objects.create(**validated_data, author=author)
-        recipe.tags.add(*tags)
-        ingredients_list = []
-        for ingredient in ingredients:
-            ingredient_id = ingredient['ingredient']['id']
-            current_amount = ingredient.get('amount')
-            ingredients_list.append(
-                RecipeIngredient(
-                    recipe=recipe,
-                    ingredient=ingredient_id,
-                    amount=current_amount
-                ))
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        recipe.tags.set(tags)
+        ingredients_list = self.process_ingredients(recipe, ingredients)
         RecipeIngredient.objects.bulk_create(ingredients_list)
         return recipe
 
@@ -191,19 +174,9 @@ class RecipePostSerializer(ShowingRecipeSerializer):
     def update(self, instance, validated_data):
         ingredients = validated_data.pop('recipe_ingredients')
         tags = validated_data.pop('tags')
-        instance.tags.clear()
-        instance.tags.add(*tags)
-        RecipeIngredient.objects.filter(recipe=instance).delete()
-        ingredients_list = []
-        for ingredient in ingredients:
-            ingredient_id = ingredient['ingredient']['id']
-            current_amount = ingredient.get('amount')
-            ingredients_list.append(
-                RecipeIngredient(
-                    recipe=instance,
-                    ingredient=ingredient_id,
-                    amount=current_amount
-                ))
+        instance.tags.set(tags)
+        instance.ingredient_recipe_ingredients.all().delete()
+        ingredients_list = self.process_ingredients(instance, ingredients)
         RecipeIngredient.objects.bulk_create(ingredients_list)
         for field, value in validated_data.items():
             setattr(instance, field, value)
@@ -254,15 +227,14 @@ class FavoriteShopingCartSubsrRecipeSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'image', 'cooking_time']
 
     def get_is_favorited(self, obj):
-        user = self.context.get('request').user
+        user = self.context['request'].user
         return (not user.is_anonymous
-                and Favorite.objects.filter(recipe=obj, user=user).exists())
+                and obj.favored_by.filter(user=user).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context.get('request').user
+        user = self.context['request'].user
         return (not user.is_anonymous
-                and ShoppingCart.objects.filter(recipe=obj,
-                                                user=user).exists())
+                and obj.carts.filter(user=user).exists())
 
 
 class UserSubscribeSerializer(ShowUserSerializer):
@@ -286,26 +258,21 @@ class UserSubscribeSerializer(ShowUserSerializer):
         request = self.context.get('request')
         author = self.instance
         user = request.user if request else None
-
         if user == author:
             raise serializers.ValidationError('Нельзя подписаться на себя.')
-
-        if Follow.objects.filter(user=user, author=author).exists():
+        if user and user.follower.filter(author=author).exists():
             raise serializers.ValidationError('Вы уже подписаны.')
 
         return data
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-
         if request and not request.user.is_anonymous:
             return Follow.objects.filter(
                 user=request.user, author=obj).exists()
-
         return False
 
     def get_recipes_count(self, obj: User) -> int:
-
         return obj.recipes.count()
 
 
