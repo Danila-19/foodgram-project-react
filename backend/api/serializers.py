@@ -119,21 +119,6 @@ class ShowingRecipeSerializer(serializers.ModelSerializer):
                 and obj.carts.filter(user=user).exists())
 
 
-def process_ingredients(self, recipe, ingredients):
-    ingredients_list = []
-    for ingredient in ingredients:
-        ingredient_id = ingredient['ingredient']['id']
-        current_amount = ingredient.get('amount')
-        ingredients_list.append(
-            RecipeIngredient(
-                recipe=recipe,
-                ingredient=ingredient_id,
-                amount=current_amount
-            )
-        )
-    return ingredients_list
-
-
 class RecipePostSerializer(ShowingRecipeSerializer):
 
     ingredients = RecipeIngredientSerializer(
@@ -158,6 +143,20 @@ class RecipePostSerializer(ShowingRecipeSerializer):
         model = Recipe
         fields = '__all__'
         read_only_fields = ('author',)
+
+    def process_ingredients(self, recipe, ingredients):
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient['ingredient']['id']
+            current_amount = ingredient.get('amount')
+            ingredients_list.append(
+                RecipeIngredient(
+                    recipe=recipe,
+                    ingredient=ingredient_id,
+                    amount=current_amount
+                )
+            )
+        return ingredients_list
 
     def create(self, validated_data):
         author = self.context.get('request').user
