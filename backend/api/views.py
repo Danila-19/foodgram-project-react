@@ -116,7 +116,7 @@ class IngredientViewSet(viewsets.ModelViewSet):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
-    queryset = Recipe.objects.all().order_by('id')
+    queryset = Recipe.objects.all()
     pagination_class = CustomPaginator
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend, )
