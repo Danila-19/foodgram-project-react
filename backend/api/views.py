@@ -27,7 +27,7 @@ User = get_user_model()
 
 
 class CustomUserViewSet(UserViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     pagination_class = CustomPaginator
     http_method_names = ['get', 'post', 'delete']
 
