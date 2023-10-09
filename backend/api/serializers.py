@@ -255,7 +255,7 @@ class UserSubscribeSerializer(ShowUserSerializer):
 
     def validate(self, data):
         data = super().validate(data)
-        request = self.context['request'].request
+        request = self.context.get('request')
         author = self.instance
         user = request.user if request else None
         if user == author:
@@ -263,11 +263,11 @@ class UserSubscribeSerializer(ShowUserSerializer):
         if user and user.follower.filter(author=author).exists():
             raise serializers.ValidationError('Вы уже подписаны.')
         return data
-
+ 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request and not request.user.is_anonymous:
-            return obj.follower.filter(user=request.user).exists()
+            return obj.following.filter(user=request.user).exists()
         return False
 
     def get_recipes_count(self, obj: User) -> int:
