@@ -85,10 +85,11 @@ class CustomUserViewSet(UserViewSet):
                 return Response({'detail': 'Вы уже подписаны'},
                                 status=status.HTTP_400_BAD_REQUEST)
             Follow.objects.create(user=user, author=author)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({'detail': 'Подписка успешно оформлена'},
+                            status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             user.following.filter(author=author).delete()
-            return Response({'detail': 'Вы отписались'},
+            return Response({'detail': 'Вы успешно отписались'},
                             status=status.HTTP_204_NO_CONTENT)
 
 
