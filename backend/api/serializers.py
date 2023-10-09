@@ -263,7 +263,7 @@ class UserSubscribeSerializer(ShowUserSerializer):
         if user and user.follower.filter(author=author).exists():
             raise serializers.ValidationError('Вы уже подписаны.')
         return data
- 
+
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request and not request.user.is_anonymous:
