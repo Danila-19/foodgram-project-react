@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import filters, status, viewsets
 
 from api.filters import RecipeFilter
-from api.pagination import CustomPaginator
+from api.pagination import CustomPaginator, CustomPaginatorSubs
 from api.serializers import (CreateUserSerializer,
                              FavoriteShopingCartSubsrRecipeSerializer,
                              FavouriteSerializer, IngredientSerializer,
@@ -28,7 +28,7 @@ User = get_user_model()
 
 class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
-    pagination_class = CustomPaginator
+    pagination_class = CustomPaginatorSubs
     http_method_names = ['get', 'post', 'delete']
 
     def get_serializer_class(self):
