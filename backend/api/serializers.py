@@ -11,7 +11,6 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from users.models import Follow
 
 
 User = get_user_model()
@@ -256,7 +255,7 @@ class UserSubscribeSerializer(ShowUserSerializer):
 
     def validate(self, data):
         data = super().validate(data)
-        request = self.context.get('request')
+        request = self.context['request']
         author = self.instance
         user = request.user if request else None
         if user == author:
@@ -267,10 +266,9 @@ class UserSubscribeSerializer(ShowUserSerializer):
         return data
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         if request and not request.user.is_anonymous:
-            return Follow.objects.filter(
-                user=request.user, author=obj).exists()
+            return obj.follower.filter(user=request.user).exists()
         return False
 
     def get_recipes_count(self, obj: User) -> int:

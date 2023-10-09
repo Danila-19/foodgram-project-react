@@ -81,13 +81,13 @@ class CustomUserViewSet(UserViewSet):
             author, data=request.data, context={'request': request})
         if request.method == 'POST':
             serializer.is_valid(raise_exception=True)
-            if user.followings.filter(author=author).exists():
+            if user.following.filter(author=author).exists():
                 return Response({'detail': 'Вы уже подписаны'},
                                 status=status.HTTP_400_BAD_REQUEST)
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            user.followings.filter(author=author).delete()
+            user.following.filter(author=author).delete()
             return Response({'detail': 'Вы отписались'},
                             status=status.HTTP_204_NO_CONTENT)
 
@@ -132,7 +132,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,))
     def favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
-        serializer = FavouriteSerializer(recipe, context={"request": request})
+        serializer = FavouriteSerializer(recipe, context={'request': request})
         if request.method == 'POST':
             if request.user.favorite_recipes.filter(recipe=recipe).exists():
                 return Response({'errors': 'Рецепт уже добавлен в избранное'},
