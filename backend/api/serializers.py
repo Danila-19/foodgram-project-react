@@ -10,6 +10,7 @@ from recipes.models import (
     RecipeIngredient,
     ShoppingCart,
     Tag,
+    Favorite
 )
 
 
@@ -107,13 +108,13 @@ class ShowingRecipeSerializer(serializers.ModelSerializer):
             'is_favorited',
             'is_in_shopping_cart',)
 
-    def get_is_favorited(self, obj):
-        user = self.context['request'].user
+    def get_is_favorited(self, obj): 
+        user = self.context.get('request').user
         return (not user.is_anonymous
-                and obj.favored_by.filter(user=user).exists())
+                and Favorite.objects.filter(recipe=obj, user=user).exists())
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context['request'].user
+        user = self.context.get('request').user
         return (not user.is_anonymous
                 and obj.carts.filter(user=user).exists())
 
