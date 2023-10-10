@@ -76,18 +76,19 @@ class CustomUserViewSet(UserViewSet):
             permission_classes=(IsAuthenticated,))
     def subscribe(self, request, **kwargs):
         author = get_object_or_404(User, id=kwargs['id'])
-        user = request.user
         serializer = UserSubscribeSerializer(
             author, data=request.data, context={'request': request})
         if request.method == 'POST':
             serializer.is_valid(raise_exception=True)
-            if user.followings.filter(author=author).exists():
+            user = request.user
+            if author.followers.filter(user=user).exists():
                 return Response({'detail': 'Вы уже подписаны'},
                                 status=status.HTTP_400_BAD_REQUEST)
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
-            user.followings.filter(author=author).delete()
+            user = request.user
+            author.followers.filter(user=user).delete()
             return Response({'detail': 'Вы отписались'},
                             status=status.HTTP_204_NO_CONTENT)
 
