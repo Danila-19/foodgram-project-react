@@ -81,14 +81,14 @@ class CustomUserViewSet(UserViewSet):
         if request.method == 'POST':
             serializer.is_valid(raise_exception=True)
             user = request.user
-            if author.followers.filter(user=user).exists():
+            if author.following.filter(user=user).exists():
                 return Response({'detail': 'Вы уже подписаны'},
                                 status=status.HTTP_400_BAD_REQUEST)
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         if request.method == 'DELETE':
             user = request.user
-            author.followers.filter(user=user).delete()
+            author.following.filter(user=user).delete()
             return Response({'detail': 'Вы отписались'},
                             status=status.HTTP_204_NO_CONTENT)
 
