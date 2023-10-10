@@ -58,10 +58,9 @@ class ShowUserSerializer(UserSerializer):
                   'last_name', 'is_subscribed',)
 
     def get_is_subscribed(self, obj):
-        if (self.context.get('request')
-           and not self.context['request'].user.is_anonymous):
-            return Follow.objects.filter(user=self.context['request'].user,
-                                         author=obj).exists()
+        request = self.context['request']
+        if request and not request.user.is_anonymous:
+            return obj.following.filter(user=request.user).exists()
         return False
 
 
@@ -260,7 +259,7 @@ class UserSubscribeSerializer(ShowUserSerializer):
 
     def validate(self, data):
         data = super().validate(data)
-        request = self.context.get('request')
+        request = self.context['request']
         author = self.instance
         user = request.user if request else None
         if user == author:
@@ -270,7 +269,7 @@ class UserSubscribeSerializer(ShowUserSerializer):
         return data
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request')
+        request = self.context['request']
         if request and not request.user.is_anonymous:
             return obj.following.filter(user=request.user).exists()
         return False
