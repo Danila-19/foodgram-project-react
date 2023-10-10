@@ -11,7 +11,6 @@ from recipes.models import (
     ShoppingCart,
     Tag,
 )
-from users.models import Follow
 
 
 User = get_user_model()
