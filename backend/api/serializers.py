@@ -12,6 +12,7 @@ from recipes.models import (
     Tag,
     Favorite
 )
+from users.models import Follow
 
 
 User = get_user_model()
@@ -58,7 +59,11 @@ class ShowUserSerializer(UserSerializer):
                   'last_name', 'is_subscribed',)
 
     def get_is_subscribed(self, obj):
-        return obj.follower.filter(user=self.context['request'].user).exists()
+        if (self.context.get('request')
+           and not self.context['request'].user.is_anonymous):
+            return Follow.objects.filter(user=self.context['request'].user,
+                                         author=obj).exists()
+        return False
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
