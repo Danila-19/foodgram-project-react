@@ -20,6 +20,7 @@ class RecipeFilter(FilterSet):
         method='is_in_shopping_cart_method')
 
     class Meta:
+        ordering = ['-pub_date']
         model = Recipe
         fields = ('author', 'tags')
 
